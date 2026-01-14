@@ -36,7 +36,7 @@ export default function MarketPage() {
       const response = await fetch('/api/shops')
       if (response.ok) {
         const data = await response.json()
-        setShops(data)
+        setShops(data.shops || [])
       }
     } catch (error) {
       console.error('Failed to fetch shops:', error)

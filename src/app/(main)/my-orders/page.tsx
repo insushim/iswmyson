@@ -44,7 +44,7 @@ export default function MyOrdersPage() {
       const response = await fetch('/api/orders')
       if (response.ok) {
         const data = await response.json()
-        setOrders(data)
+        setOrders(data.orders || [])
       }
     } catch (error) {
       console.error('Failed to fetch orders:', error)

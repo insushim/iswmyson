@@ -47,7 +47,7 @@ export default function JudgeReportsPage() {
       const response = await fetch('/api/reports')
       if (response.ok) {
         const data = await response.json()
-        setReports(data)
+        setReports(data.reports || [])
       }
     } catch (error) {
       console.error('Failed to fetch reports:', error)

@@ -62,7 +62,7 @@ export default function JudgeTrialsPage() {
       const response = await fetch('/api/trials')
       if (response.ok) {
         const data = await response.json()
-        setTrials(data)
+        setTrials(data.trials || [])
       }
     } catch (error) {
       console.error('Failed to fetch trials:', error)

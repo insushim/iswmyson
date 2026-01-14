@@ -7,8 +7,10 @@ export async function GET(request: NextRequest) {
     const session = await auth()
     if (!session?.user?.id) return NextResponse.json({ error: '로그인 필요' }, { status: 401 })
 
+    const isJudge = session.user.isJudge
+
     const reports = await prisma.report.findMany({
-      where: { OR: [{ reporterId: session.user.id }, { reportedId: session.user.id }] },
+      where: isJudge ? {} : { OR: [{ reporterId: session.user.id }, { reportedId: session.user.id }] },
       include: {
         reporter: { select: { id: true, nickname: true } },
         reported: { select: { id: true, nickname: true } },
