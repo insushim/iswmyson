@@ -47,7 +47,7 @@ export default function JudgeObjectionsPage() {
       const response = await fetch('/api/judge/objections')
       if (response.ok) {
         const data = await response.json()
-        setObjections(data)
+        setObjections(data.objections || [])
       }
     } catch (error) {
       console.error('Failed to fetch objections:', error)

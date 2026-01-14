@@ -63,12 +63,12 @@ export default function TransactionsPage() {
 
       if (txRes.ok) {
         const txData = await txRes.json()
-        setTransactions(txData)
+        setTransactions(txData.transactions || [])
       }
 
       if (usersRes.ok) {
         const usersData = await usersRes.json()
-        setUsers(usersData.filter((u: User) => u.id !== session?.user?.id))
+        setUsers((usersData.users || []).filter((u: User) => u.id !== session?.user?.id))
       }
     } catch (error) {
       console.error('Failed to fetch data:', error)

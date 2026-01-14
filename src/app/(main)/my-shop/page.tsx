@@ -80,14 +80,18 @@ export default function MyShopPage() {
       const response = await fetch('/api/shops/my')
       if (response.ok) {
         const data = await response.json()
-        setShop(data)
-        setHasShop(true)
-        setShopForm({
-          name: data.name,
-          jobTitle: JOB_OPTIONS.includes(data.jobTitle) ? data.jobTitle : '기타',
-          customJob: JOB_OPTIONS.includes(data.jobTitle) ? '' : data.jobTitle,
-          description: data.description || ''
-        })
+        if (data.shop) {
+          setShop(data.shop)
+          setHasShop(true)
+          setShopForm({
+            name: data.shop.name,
+            jobTitle: JOB_OPTIONS.includes(data.shop.jobTitle) ? data.shop.jobTitle : '기타',
+            customJob: JOB_OPTIONS.includes(data.shop.jobTitle) ? '' : data.shop.jobTitle,
+            description: data.shop.description || ''
+          })
+        } else {
+          setHasShop(false)
+        }
       } else if (response.status === 404) {
         setHasShop(false)
       }

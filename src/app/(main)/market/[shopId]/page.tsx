@@ -57,7 +57,7 @@ export default function ShopDetailPage() {
       const response = await fetch(`/api/shops/${shopId}`)
       if (response.ok) {
         const data = await response.json()
-        setShop(data)
+        setShop(data.shop)
       } else {
         toast.error('가게를 찾을 수 없습니다')
         router.push('/market')

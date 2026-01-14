@@ -48,7 +48,7 @@ export default function ReportPage() {
       const usersRes = await fetch('/api/users/list')
       if (usersRes.ok) {
         const usersData = await usersRes.json()
-        setUsers(usersData)
+        setUsers(usersData.users || [])
       }
 
       if (orderId) {
