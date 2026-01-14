@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  nickname      String    @unique
+  password      String
+  marks         Int       @default(1000)
+  isJudge       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  shop                    Shop?
+  ordersAsCustomer        Order[]        @relation("CustomerOrders")
+  sentTransactions        Transaction[]  @relation("SentTransactions")
+  receivedTransactions    Transaction[]  @relation("ReceivedTransactions")
+  reports                 Report[]       @relation("Reporter")
+  reportedBy              Report[]       @relation("Reported")
+  trialsAsDefendant       Trial[]        @relation("Defendant")
+  trialsAsPlaintiff       Trial[]        @relation("Plaintiff")
+  notifications           Notification[]
+}
+
+model Shop {
+  id          String    @id @default(cuid())
+  ownerId     String    @unique
+  owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name        String
+  jobTitle    String
+  description String?
+  isOpen      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  menuItems   MenuItem[]
+  orders      Order[]
+}
+
+model MenuItem {
+  id          String    @id @default(cuid())
+  shopId      String
+  shop        Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  basePrice   Int?
+  isAvailable Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  orderNumber     String      @unique @default(cuid())
+  customerId      String
+  customer        User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  shopId          String
+  shop            Shop        @relation(fields: [shopId], references: [id])
+
+  customRequest   String
+  proposedPrice   Int?
+  estimatedDate   DateTime?
+  ownerMessage    String?
+
+  status          String      @default("PENDING")
+  isPaid          Boolean     @default(false)
+  isDelivered     Boolean     @default(false)
+  canReport       Boolean     @default(false)
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  reports         Report[]    @relation("OrderReports")
+}
+
+model Transaction {
+  id              String            @id @default(cuid())
+  senderId        String
+  sender          User              @relation("SentTransactions", fields: [senderId], references: [id])
+  receiverId      String
+  receiver        User              @relation("ReceivedTransactions", fields: [receiverId], references: [id])
+
+  amount          Int
+  description     String
+  status          String            @default("PENDING")
+
+  hasObjection    Boolean           @default(false)
+  objectionReason String?
+  objectionStatus String?
+
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Report {
+  id            String       @id @default(cuid())
+  reporterId    String
+  reporter      User         @relation("Reporter", fields: [reporterId], references: [id])
+  reportedId    String
+  reported      User         @relation("Reported", fields: [reportedId], references: [id])
+
+  orderId       String?
+  order         Order?       @relation("OrderReports", fields: [orderId], references: [id])
+
+  reason        String
+  evidence      String?
+  status        String       @default("PENDING")
+
+  createdAt     DateTime     @default(now())
+
+  trial         Trial?
+}
+
+model Trial {
+  id              String      @id @default(cuid())
+  reportId        String      @unique
+  report          Report      @relation(fields: [reportId], references: [id])
+
+  defendantId     String
+  defendant       User        @relation("Defendant", fields: [defendantId], references: [id])
+  plaintiffId     String
+  plaintiff       User        @relation("Plaintiff", fields: [plaintiffId], references: [id])
+
+  scheduledAt     DateTime?
+  verdict         String?
+  fineAmount      Int?
+  fineReduced     Boolean     @default(false)
+  finalFine       Int?
+
+  status          String      @default("SCHEDULED")
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Notification {
+  id          String           @id @default(cuid())
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type        String
+  title       String
+  message     String
+  link        String?
+  isRead      Boolean          @default(false)
+
+  createdAt   DateTime         @default(now())
+}
