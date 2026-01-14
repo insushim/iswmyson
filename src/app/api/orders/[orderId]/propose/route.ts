@@ -23,7 +23,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       where: { id: orderId },
       data: {
         proposedPrice,
-        estimatedDate: new Date(estimatedDate),
+        estimatedDate: estimatedDate,
         ownerMessage,
         status: 'PRICE_PROPOSED'
       },

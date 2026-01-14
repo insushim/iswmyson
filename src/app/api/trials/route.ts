@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         reportId,
         defendantId: report.reportedId,
         plaintiffId: report.reporterId,
-        scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
+        scheduledAt: scheduledAt || null,
         status: 'SCHEDULED'
       },
       include: {
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
           userId: report.reportedId,
           type: 'TRIAL',
           title: '재판이 예정되었습니다',
-          message: `죄목: ${report.reason}\n시간: ${scheduledAt ? new Date(scheduledAt).toLocaleString('ko-KR') : '미정'}`,
+          message: `죄목: ${report.reason}\n시간: ${scheduledAt || '미정'}`,
           link: '/trial/records'
         }
       }),
