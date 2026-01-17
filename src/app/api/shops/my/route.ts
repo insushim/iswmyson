@@ -9,7 +9,14 @@ export async function GET(request: NextRequest) {
 
     const shop = await prisma.shop.findUnique({
       where: { ownerId: session.user.id },
-      include: { menuItems: { orderBy: { createdAt: 'asc' } } }
+      include: {
+        menuItems: { orderBy: { createdAt: 'asc' } },
+        orders: {
+          where: { status: { in: ['PENDING', 'PROPOSED', 'APPROVED', 'PAID'] } },
+          include: { customer: { select: { nickname: true } } },
+          orderBy: { createdAt: 'desc' }
+        }
+      }
     })
 
     return NextResponse.json({ shop })

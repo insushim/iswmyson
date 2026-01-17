@@ -66,25 +66,25 @@ export default function MarketPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 lg:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">시장</h1>
-          <p className="text-gray-600">다양한 가게들을 둘러보고 주문해보세요!</p>
+          <h1 className="text-xl lg:text-2xl font-bold text-gray-900">시장</h1>
+          <p className="text-sm lg:text-base text-gray-600">다양한 가게들을 둘러보고 주문해보세요!</p>
         </div>
         <Link href="/my-shop">
-          <Button>
+          <Button size="sm" className="w-full sm:w-auto">
             <Store className="mr-2 h-4 w-4" />
             내 가게 관리
           </Button>
         </Link>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
           <Input
-            placeholder="가게명, 직업, 사장님 닉네임으로 검색..."
+            placeholder="가게명, 직업, 닉네임 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="pl-10"
@@ -92,18 +92,21 @@ export default function MarketPage() {
         </div>
         <div className="flex gap-2">
           <Button
+            size="sm"
             variant={filterOpen === 'all' ? 'default' : 'outline'}
             onClick={() => setFilterOpen('all')}
           >
             전체
           </Button>
           <Button
+            size="sm"
             variant={filterOpen === 'open' ? 'success' : 'outline'}
             onClick={() => setFilterOpen('open')}
           >
             영업중
           </Button>
           <Button
+            size="sm"
             variant={filterOpen === 'closed' ? 'secondary' : 'outline'}
             onClick={() => setFilterOpen('closed')}
           >
@@ -119,7 +122,7 @@ export default function MarketPage() {
           description={searchTerm ? "검색 결과가 없습니다. 다른 키워드로 검색해보세요." : "아직 등록된 가게가 없습니다."}
         />
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
           {filteredShops.map((shop) => (
             <Link key={shop.id} href={`/market/${shop.id}`}>
               <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-amber-300">

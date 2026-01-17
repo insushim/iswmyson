@@ -12,6 +12,30 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const type = searchParams.get('type')
+    const orderId = searchParams.get('orderId')
+
+    // 개별 주문 조회
+    if (orderId) {
+      const order = await prisma.order.findUnique({
+        where: { id: orderId },
+        include: {
+          customer: { select: { id: true, nickname: true } },
+          shop: { include: { owner: { select: { id: true, nickname: true } } } }
+        }
+      })
+
+      if (!order) {
+        return NextResponse.json({ error: '주문을 찾을 수 없습니다' }, { status: 404 })
+      }
+
+      // 권한 확인: 주문자이거나 가게 주인이어야 함
+      const shop = await prisma.shop.findUnique({ where: { id: order.shopId } })
+      if (order.customerId !== session.user.id && shop?.ownerId !== session.user.id) {
+        return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+      }
+
+      return NextResponse.json(order)
+    }
 
     let orders
     if (type === 'owner') {

@@ -179,7 +179,7 @@ export default function TransactionsPage() {
   const myId = session?.user?.id
   const pendingReceived = transactions.filter(t => t.receiver.id === myId && t.status === 'PENDING')
   const pendingSent = transactions.filter(t => t.sender.id === myId && t.status === 'PENDING')
-  const completedTx = transactions.filter(t => t.status === 'COMPLETED')
+  const completedTx = transactions.filter(t => t.status === 'COMPLETED' || t.status === 'ACCEPTED')
   const rejectedTx = transactions.filter(t => t.status === 'REJECTED')
 
   if (isLoading) {

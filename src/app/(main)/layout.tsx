@@ -32,12 +32,10 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
-      <div className="flex">
-        <Navigation />
-        <main className="flex-1 ml-64 pt-16 p-6">
-          {children}
-        </main>
-      </div>
+      <Navigation />
+      <main className="lg:ml-48 pt-16 pb-20 lg:pb-4 px-3 lg:px-6 min-h-screen">
+        {children}
+      </main>
     </div>
   )
 }

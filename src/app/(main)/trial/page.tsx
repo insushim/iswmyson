@@ -60,12 +60,12 @@ export default function TrialPage() {
 
       if (reportsRes.ok) {
         const reportsData = await reportsRes.json()
-        setReports(reportsData)
+        setReports(reportsData.reports || [])
       }
 
       if (trialsRes.ok) {
         const trialsData = await trialsRes.json()
-        setTrials(trialsData)
+        setTrials(trialsData.trials || [])
       }
     } catch (error) {
       console.error('Failed to fetch data:', error)

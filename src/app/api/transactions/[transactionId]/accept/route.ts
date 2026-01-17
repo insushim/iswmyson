@@ -22,7 +22,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const [updatedTransaction] = await prisma.$transaction([
       prisma.transaction.update({
         where: { id: transactionId },
-        data: { status: 'ACCEPTED' },
+        data: { status: 'COMPLETED' },
         include: {
           sender: { select: { id: true, nickname: true, marks: true } },
           receiver: { select: { id: true, nickname: true, marks: true } }
