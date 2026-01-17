@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -88,8 +89,13 @@ export default function JudgeLoginPage() {
             )}
           </div>
         </CardContent>
-        <CardFooter className="justify-center">
+        <CardFooter className="flex flex-col gap-3">
           <p className="text-sm text-gray-500">심현보 전용 페이지입니다</p>
+          <Link href="/market" className="w-full">
+            <Button variant="outline" className="w-full">
+              일반 화면으로 돌아가기
+            </Button>
+          </Link>
         </CardFooter>
       </Card>
     </div>

@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { MarkDisplay } from '@/components/common/MarkDisplay'
-import { Store, ArrowLeft, Package, ShoppingCart, Coins } from 'lucide-react'
+import { Store, ArrowLeft, Package, ShoppingCart, Coins, Plus, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -21,6 +21,7 @@ interface MenuItem {
   name: string
   description: string | null
   basePrice: number
+  estimatedTime: string | null
   isAvailable: boolean
 }
 
@@ -45,6 +46,15 @@ export default function ShopDetailPage() {
     customRequest: '',
     selectedMenus: [] as string[]
   })
+
+  // 메뉴 추가 폼
+  const [showAddMenu, setShowAddMenu] = useState(false)
+  const [menuForm, setMenuForm] = useState({
+    name: '',
+    basePrice: '',
+    estimatedTime: ''
+  })
+  const [isAddingMenu, setIsAddingMenu] = useState(false)
 
   const shopId = params.shopId as string
   const isOwner = session?.user?.id === shop?.owner.id
@@ -117,6 +127,46 @@ export default function ShopDetailPage() {
     .filter(item => orderData.selectedMenus.includes(item.id))
     .reduce((sum, item) => sum + item.basePrice, 0) || 0
 
+  const handleAddMenu = async () => {
+    if (!menuForm.name.trim()) {
+      toast.error('메뉴 이름을 입력해주세요')
+      return
+    }
+    if (!menuForm.basePrice || parseInt(menuForm.basePrice) <= 0) {
+      toast.error('가격을 입력해주세요')
+      return
+    }
+
+    setIsAddingMenu(true)
+    try {
+      const response = await fetch(`/api/shops/${shopId}/menu`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: menuForm.name,
+          basePrice: parseInt(menuForm.basePrice),
+          estimatedTime: menuForm.estimatedTime || null,
+          description: null
+        })
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || '메뉴 추가 실패')
+      }
+
+      toast.success('메뉴가 추가되었습니다!')
+      setMenuForm({ name: '', basePrice: '', estimatedTime: '' })
+      setShowAddMenu(false)
+      fetchShop()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '메뉴 추가 실패'
+      toast.error(message)
+    } finally {
+      setIsAddingMenu(false)
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -181,11 +231,77 @@ export default function ShopDetailPage() {
         </TabsList>
 
         <TabsContent value="menu" className="space-y-4">
+          {/* 가게 주인일 때 메뉴 추가 버튼 */}
+          {isOwner && (
+            <div className="space-y-4">
+              {!showAddMenu ? (
+                <Button onClick={() => setShowAddMenu(true)} className="w-full">
+                  <Plus className="mr-2 h-4 w-4" />
+                  메뉴 추가하기
+                </Button>
+              ) : (
+                <Card className="border-amber-200 bg-amber-50">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-lg">새 메뉴 추가</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium mb-1">메뉴 이름</label>
+                      <Input
+                        value={menuForm.name}
+                        onChange={(e) => setMenuForm({ ...menuForm, name: e.target.value })}
+                        placeholder="예: 후라이드 치킨"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">가격 (마크)</label>
+                      <Input
+                        type="number"
+                        value={menuForm.basePrice}
+                        onChange={(e) => setMenuForm({ ...menuForm, basePrice: e.target.value })}
+                        placeholder="예: 5000"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">예상 시간 (선택)</label>
+                      <Input
+                        value={menuForm.estimatedTime}
+                        onChange={(e) => setMenuForm({ ...menuForm, estimatedTime: e.target.value })}
+                        placeholder="예: 30분, 1시간"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setShowAddMenu(false)
+                          setMenuForm({ name: '', basePrice: '', estimatedTime: '' })
+                        }}
+                        className="flex-1"
+                      >
+                        취소
+                      </Button>
+                      <Button
+                        onClick={handleAddMenu}
+                        disabled={isAddingMenu}
+                        className="flex-1"
+                      >
+                        {isAddingMenu ? <LoadingSpinner size="sm" className="mr-2" /> : <Plus className="mr-2 h-4 w-4" />}
+                        추가
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+
           {shop.menuItems.length === 0 ? (
             <Card>
               <CardContent className="py-12 text-center text-gray-500">
                 <Package className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                 <p>아직 등록된 메뉴가 없습니다.</p>
+                {isOwner && <p className="text-sm mt-2">위의 버튼으로 메뉴를 추가해보세요!</p>}
               </CardContent>
             </Card>
           ) : (
@@ -214,6 +330,14 @@ export default function ShopDetailPage() {
                     <div className="pt-2 border-t">
                       <MarkDisplay amount={item.basePrice} size="lg" />
                     </div>
+
+                    {/* 예상 시간 */}
+                    {item.estimatedTime && (
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Clock className="h-4 w-4" />
+                        <span>{item.estimatedTime}</span>
+                      </div>
+                    )}
 
                     {/* 바로 주문 버튼 */}
                     {!isOwner && shop.isOpen && item.isAvailable && (

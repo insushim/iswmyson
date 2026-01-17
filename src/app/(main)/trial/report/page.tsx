@@ -147,8 +147,24 @@ export default function ReportPage() {
             </div>
           )}
 
+          {/* 신고자/피신고자 정보 표시 */}
+          <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+            <div>
+              <p className="text-xs text-gray-500 mb-1">신고자 (나)</p>
+              <p className="font-medium text-blue-600">로그인한 사용자</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 mb-1">피신고자</p>
+              <p className="font-medium text-red-600">
+                {reportForm.reportedId
+                  ? users.find(u => u.id === reportForm.reportedId)?.nickname || '선택 필요'
+                  : '아래에서 선택'}
+              </p>
+            </div>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium mb-1">신고 대상</label>
+            <label className="block text-sm font-medium mb-1">신고 대상 선택</label>
             <select
               className="w-full p-2 border rounded-md"
               value={reportForm.reportedId}

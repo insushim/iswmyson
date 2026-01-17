@@ -8,14 +8,14 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (!session?.user?.id) return NextResponse.json({ error: '로그인 필요' }, { status: 401 })
 
     const { shopId } = await params
-    const { name, description, basePrice } = await request.json()
+    const { name, description, basePrice, estimatedTime } = await request.json()
 
     const shop = await prisma.shop.findUnique({ where: { id: shopId } })
     if (!shop) return NextResponse.json({ error: '존재하지 않는 가게' }, { status: 404 })
     if (shop.ownerId !== session.user.id) return NextResponse.json({ error: '권한 없음' }, { status: 403 })
 
     const menuItem = await prisma.menuItem.create({
-      data: { shopId, name, description, basePrice: basePrice || null }
+      data: { shopId, name, description, basePrice: basePrice || null, estimatedTime: estimatedTime || null }
     })
 
     return NextResponse.json({ success: true, menuItem })
