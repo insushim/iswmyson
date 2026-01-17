@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     const shop = await prisma.shop.create({
-      data: { ownerId: session.user.id, name, jobTitle, description },
+      data: { ownerId: session.user.id, name, jobTitle, description, isOpen: false },
       include: { owner: { select: { id: true, nickname: true } } }
     })
 

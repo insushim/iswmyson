@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
-import { Store, ShoppingBag, ClipboardList, ArrowLeftRight, Scale, User, Briefcase } from 'lucide-react'
+import { Store, ShoppingBag, ClipboardList, ArrowLeftRight, Scale, User, Briefcase, ScrollText } from 'lucide-react'
 
 const navItems = [
   { href: '/market', label: '시장', icon: Store },
@@ -12,6 +12,7 @@ const navItems = [
   { href: '/my-orders', label: '내 주문', icon: ClipboardList },
   { href: '/transactions', label: '거래', icon: ArrowLeftRight },
   { href: '/jobs', label: '직업', icon: Briefcase },
+  { href: '/records', label: '기록', icon: ScrollText },
   { href: '/trial', label: '재판', icon: Scale },
   { href: '/profile', label: '프로필', icon: User },
 ]
