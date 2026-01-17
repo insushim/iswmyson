@@ -27,7 +27,7 @@ export default function JudgeDashboardPage() {
 
   useEffect(() => {
     if (session?.user && !(session.user as { isJudge?: boolean }).isJudge) {
-      toast.error('재판관 권한이 없습니다')
+      toast.error('권능 권한이 없습니다')
       router.push('/')
       return
     }
@@ -75,8 +75,8 @@ export default function JudgeDashboardPage() {
           <div className="flex items-center gap-3">
             <Gavel className="h-8 w-8 text-purple-600" />
             <div>
-              <h1 className="text-xl font-bold text-gray-900">재판관 대시보드</h1>
-              <p className="text-sm text-gray-500">심현보</p>
+              <h1 className="text-xl font-bold text-gray-900">권능 대시보드</h1>
+              <p className="text-sm text-gray-500">심현보 전용</p>
             </div>
           </div>
           <Link href="/market">
@@ -156,7 +156,7 @@ export default function JudgeDashboardPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>재판관 안내</CardTitle>
+            <CardTitle>권능 안내</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid md:grid-cols-2 gap-4">
@@ -183,7 +183,7 @@ export default function JudgeDashboardPage() {
               <h3 className="font-medium mb-2 text-purple-800">벌금 감면</h3>
               <p className="text-sm text-purple-700">
                 피고인은 판결 후 30% 감면을 요청할 수 있습니다.
-                재판관의 재량에 따라 감면 여부를 결정합니다.
+                권능의 재량에 따라 감면 여부를 결정합니다.
               </p>
             </div>
           </CardContent>

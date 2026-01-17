@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { MarkDisplay } from '@/components/common/MarkDisplay'
 import { Store, ArrowLeft, Package, ShoppingCart, Coins } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
 
@@ -190,24 +191,90 @@ export default function ShopDetailPage() {
           ) : (
             <div className="grid md:grid-cols-2 gap-4">
               {shop.menuItems.map((item) => (
-                <Card key={item.id} className={!item.isAvailable ? 'opacity-60' : ''}>
-                  <CardHeader className="pb-2">
+                <Card key={item.id} className={cn(
+                  'overflow-hidden transition-all',
+                  !item.isAvailable ? 'opacity-60' : 'hover:shadow-md',
+                  orderData.selectedMenus.includes(item.id) && 'ring-2 ring-amber-400 bg-amber-50'
+                )}>
+                  <div className="p-4 space-y-3">
+                    {/* 메뉴 이름 */}
                     <div className="flex items-start justify-between">
-                      <CardTitle className="text-lg">{item.name}</CardTitle>
+                      <h3 className="font-bold text-lg text-gray-900">{item.name}</h3>
                       {!item.isAvailable && (
                         <Badge variant="secondary">품절</Badge>
                       )}
                     </div>
+
+                    {/* 설명 */}
                     {item.description && (
-                      <CardDescription>{item.description}</CardDescription>
+                      <p className="text-sm text-gray-500">{item.description}</p>
                     )}
-                  </CardHeader>
-                  <CardFooter className="pt-2">
-                    <MarkDisplay amount={item.basePrice} size="lg" />
-                  </CardFooter>
+
+                    {/* 가격 */}
+                    <div className="pt-2 border-t">
+                      <MarkDisplay amount={item.basePrice} size="lg" />
+                    </div>
+
+                    {/* 바로 주문 버튼 */}
+                    {!isOwner && shop.isOpen && item.isAvailable && (
+                      <Button
+                        variant={orderData.selectedMenus.includes(item.id) ? 'default' : 'outline'}
+                        size="sm"
+                        className="w-full"
+                        onClick={() => toggleMenuSelection(item.id)}
+                      >
+                        {orderData.selectedMenus.includes(item.id) ? '선택됨 ✓' : '선택하기'}
+                      </Button>
+                    )}
+                  </div>
                 </Card>
               ))}
             </div>
+          )}
+
+          {/* 메뉴판에서 바로 주문하기 */}
+          {!isOwner && shop.isOpen && orderData.selectedMenus.length > 0 && (
+            <Card className="border-amber-200 bg-amber-50 sticky bottom-20 lg:bottom-4">
+              <CardContent className="py-4">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-amber-800">
+                      {orderData.selectedMenus.length}개 메뉴 선택됨
+                    </p>
+                    <p className="text-sm text-amber-600">
+                      예상 금액: {estimatedTotal.toLocaleString()}마크
+                    </p>
+                  </div>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setOrderData({ ...orderData, selectedMenus: [] })}
+                    >
+                      초기화
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="flex-1 sm:flex-none"
+                      onClick={() => {
+                        const selectedNames = shop.menuItems
+                          .filter(item => orderData.selectedMenus.includes(item.id))
+                          .map(item => item.name)
+                          .join(', ')
+                        setOrderData({
+                          ...orderData,
+                          customRequest: `${selectedNames} 주문합니다.`
+                        })
+                        document.querySelector('[value="order"]')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+                      }}
+                    >
+                      <ShoppingCart className="mr-2 h-4 w-4" />
+                      주문하기
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
 

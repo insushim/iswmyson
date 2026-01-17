@@ -30,7 +30,7 @@ export default function JudgeLoginPage() {
         throw new Error(data.error || '인증 실패')
       }
 
-      toast.success('재판관 인증 완료!')
+      toast.success('권능 인증 완료!')
       router.push('/judge/dashboard')
     } catch (error) {
       const message = error instanceof Error ? error.message : '인증 실패'
@@ -49,8 +49,8 @@ export default function JudgeLoginPage() {
               <Gavel className="h-12 w-12 text-purple-600" />
             </div>
           </div>
-          <CardTitle className="text-2xl">재판관 인증</CardTitle>
-          <CardDescription>재판관 비밀번호를 입력해주세요</CardDescription>
+          <CardTitle className="text-2xl">권능 인증</CardTitle>
+          <CardDescription>권능 비밀번호를 입력해주세요</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,7 +60,7 @@ export default function JudgeLoginPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="재판관 비밀번호"
+                placeholder="권능 비밀번호"
                 disabled={isLoading}
               />
             </div>

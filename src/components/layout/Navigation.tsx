@@ -47,7 +47,7 @@ export function Navigation() {
                   'flex items-center gap-2 px-3 py-2.5 rounded-lg transition-colors text-sm',
                   pathname.startsWith('/judge') ? 'bg-purple-100 text-purple-800 font-medium' : 'text-purple-600 hover:bg-purple-50'
                 )}>
-                <Scale size={18} /><span>재판관</span>
+                <Scale size={18} /><span>권능</span>
               </Link>
             </li>
           )}
