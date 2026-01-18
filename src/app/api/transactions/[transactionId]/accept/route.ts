@@ -19,6 +19,16 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     if (transaction.status !== 'PENDING') return NextResponse.json({ error: '이미 처리된 거래' }, { status: 400 })
     if (transaction.sender.marks < transaction.amount) return NextResponse.json({ error: '상대방 마크 부족' }, { status: 400 })
 
+    // 세금 10% 계산
+    const tax = Math.floor(transaction.amount * 0.1)
+    const receiverAmount = transaction.amount - tax
+
+    // 정부 가져오기 또는 생성
+    let government = await prisma.government.findFirst()
+    if (!government) {
+      government = await prisma.government.create({ data: { marks: 400 } })
+    }
+
     const [updatedTransaction] = await prisma.$transaction([
       prisma.transaction.update({
         where: { id: transactionId },
@@ -29,7 +39,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         }
       }),
       prisma.user.update({ where: { id: transaction.senderId }, data: { marks: { decrement: transaction.amount } } }),
-      prisma.user.update({ where: { id: transaction.receiverId }, data: { marks: { increment: transaction.amount } } })
+      prisma.user.update({ where: { id: transaction.receiverId }, data: { marks: { increment: receiverAmount } } }),
+      prisma.government.update({ where: { id: government.id }, data: { marks: { increment: tax } } })
     ])
 
     await prisma.notification.create({

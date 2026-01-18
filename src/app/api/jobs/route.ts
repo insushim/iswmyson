@@ -2,13 +2,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const session = await auth()
+
     const jobs = await prisma.job.findMany({
-      orderBy: { createdAt: 'desc' }
+      orderBy: { name: 'asc' }
     })
 
-    return NextResponse.json({ jobs })
+    let myShopJobs: string[] = []
+    if (session?.user?.id) {
+      const myShops = await prisma.shop.findMany({
+        where: { ownerId: session.user.id },
+        select: { jobTitle: true }
+      })
+      myShopJobs = [...new Set(myShops.map(s => s.jobTitle))]
+    }
+
+    return NextResponse.json({ jobs, myShopJobs })
   } catch (error) {
     console.error('직업 목록 조회 오류:', error)
     return NextResponse.json({ error: '직업 목록 조회 실패' }, { status: 500 })

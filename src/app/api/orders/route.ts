@@ -39,10 +39,10 @@ export async function GET(request: NextRequest) {
 
     let orders
     if (type === 'owner') {
-      const shop = await prisma.shop.findUnique({ where: { ownerId: session.user.id } })
-      if (!shop) return NextResponse.json({ orders: [] })
+      const shops = await prisma.shop.findMany({ where: { ownerId: session.user.id } })
+      if (shops.length === 0) return NextResponse.json({ orders: [] })
       orders = await prisma.order.findMany({
-        where: { shopId: shop.id },
+        where: { shopId: { in: shops.map(s => s.id) } },
         include: {
           customer: { select: { id: true, nickname: true } },
           shop: { include: { owner: { select: { id: true, nickname: true } } } }

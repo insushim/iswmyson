@@ -49,13 +49,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '직업은 1~20자' }, { status: 400 })
     }
 
-    const existingShop = await prisma.shop.findUnique({ where: { ownerId: session.user.id } })
-    if (existingShop) {
-      return NextResponse.json({ error: '이미 가게를 운영 중' }, { status: 400 })
-    }
-
     const shop = await prisma.shop.create({
-      data: { ownerId: session.user.id, name, jobTitle, description, isOpen: false },
+      data: { ownerId: session.user.id, name, jobTitle, description, isOpen: true },
       include: { owner: { select: { id: true, nickname: true } } }
     })
 

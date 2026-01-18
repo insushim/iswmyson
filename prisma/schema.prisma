@@ -11,12 +11,12 @@ model User {
   id            String    @id @default(cuid())
   nickname      String    @unique
   password      String
-  marks         Int       @default(1000)
+  marks         Int       @default(100)
   isJudge       Boolean   @default(false)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  shop                    Shop?
+  shops                   Shop[]
   ordersAsCustomer        Order[]        @relation("CustomerOrders")
   sentTransactions        Transaction[]  @relation("SentTransactions")
   receivedTransactions    Transaction[]  @relation("ReceivedTransactions")
@@ -25,11 +25,35 @@ model User {
   trialsAsDefendant       Trial[]        @relation("Defendant")
   trialsAsPlaintiff       Trial[]        @relation("Plaintiff")
   notifications           Notification[]
+  suggestions             Suggestion[]
+}
+
+model Government {
+  id            String    @id @default(cuid())
+  marks         Int       @default(400)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders        GovernmentOrder[]
+}
+
+model GovernmentOrder {
+  id              String      @id @default(cuid())
+  governmentId    String
+  government      Government  @relation(fields: [governmentId], references: [id])
+  shopId          String
+  shopName        String
+  ownerNickname   String
+
+  description     String
+  amount          Int
+
+  createdAt       DateTime    @default(now())
 }
 
 model Shop {
   id          String    @id @default(cuid())
-  ownerId     String    @unique
+  ownerId     String
   owner       User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   name        String
   jobTitle    String
@@ -40,6 +64,7 @@ model Shop {
 
   menuItems   MenuItem[]
   orders      Order[]
+  suggestions Suggestion[]
 }
 
 model Job {
@@ -159,4 +184,17 @@ model Notification {
   isRead      Boolean          @default(false)
 
   createdAt   DateTime         @default(now())
+}
+
+model Suggestion {
+  id          String    @id @default(cuid())
+  shopId      String
+  shop        Shop      @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content     String
+  status      String    @default("PENDING")
+  reply       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

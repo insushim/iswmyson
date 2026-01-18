@@ -32,7 +32,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
 
     const { shopId } = await params
     const { searchParams } = new URL(request.url)
-    const menuItemId = searchParams.get('menuItemId')
+    const menuItemId = searchParams.get('menuItemId') || searchParams.get('menuId')
 
     if (!menuItemId) return NextResponse.json({ error: '메뉴 ID 필요' }, { status: 400 })
 

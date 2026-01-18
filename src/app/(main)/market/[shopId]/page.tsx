@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
 import { MarkDisplay } from '@/components/common/MarkDisplay'
-import { Store, ArrowLeft, Package, ShoppingCart, Coins, Plus, Clock } from 'lucide-react'
+import { Store, ArrowLeft, Package, ShoppingCart, Coins, Plus, Clock, MessageSquare, Send } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
@@ -25,6 +25,15 @@ interface MenuItem {
   isAvailable: boolean
 }
 
+interface Suggestion {
+  id: string
+  content: string
+  reply: string | null
+  status: string
+  createdAt: string
+  user: { id: string; nickname: string }
+}
+
 interface Shop {
   id: string
   name: string
@@ -33,6 +42,7 @@ interface Shop {
   isOpen: boolean
   owner: { id: string; nickname: string }
   menuItems: MenuItem[]
+  suggestions?: Suggestion[]
 }
 
 export default function ShopDetailPage() {
@@ -56,11 +66,17 @@ export default function ShopDetailPage() {
   })
   const [isAddingMenu, setIsAddingMenu] = useState(false)
 
+  // 건의 관련
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([])
+  const [suggestionContent, setSuggestionContent] = useState('')
+  const [isSubmittingSuggestion, setIsSubmittingSuggestion] = useState(false)
+
   const shopId = params.shopId as string
   const isOwner = session?.user?.id === shop?.owner.id
 
   useEffect(() => {
     fetchShop()
+    fetchSuggestions()
   }, [shopId])
 
   const fetchShop = async () => {
@@ -78,6 +94,47 @@ export default function ShopDetailPage() {
       toast.error('가게 정보를 불러오는데 실패했습니다')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchSuggestions = async () => {
+    try {
+      const response = await fetch(`/api/shops/${shopId}/suggestions`)
+      if (response.ok) {
+        const data = await response.json()
+        setSuggestions(data.suggestions || [])
+      }
+    } catch (error) {
+      // 가게 주인이 아니면 403 에러이지만 무시
+    }
+  }
+
+  const handleSubmitSuggestion = async () => {
+    if (!suggestionContent.trim()) {
+      toast.error('건의 내용을 입력해주세요')
+      return
+    }
+
+    setIsSubmittingSuggestion(true)
+    try {
+      const response = await fetch(`/api/shops/${shopId}/suggestions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: suggestionContent })
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || '건의 등록 실패')
+      }
+
+      toast.success('건의가 등록되었습니다!')
+      setSuggestionContent('')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '건의 등록 실패'
+      toast.error(message)
+    } finally {
+      setIsSubmittingSuggestion(false)
     }
   }
 
@@ -226,6 +283,12 @@ export default function ShopDetailPage() {
             <TabsTrigger value="order">
               <ShoppingCart className="mr-2 h-4 w-4" />
               주문하기
+            </TabsTrigger>
+          )}
+          {!isOwner && (
+            <TabsTrigger value="suggestion">
+              <MessageSquare className="mr-2 h-4 w-4" />
+              건의하기
             </TabsTrigger>
           )}
         </TabsList>
@@ -465,6 +528,52 @@ export default function ShopDetailPage() {
                     <>
                       <ShoppingCart className="mr-2 h-4 w-4" />
                       주문 접수하기
+                    </>
+                  )}
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+        )}
+
+        {!isOwner && (
+          <TabsContent value="suggestion" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="h-5 w-5" />
+                  가게에 건의하기
+                </CardTitle>
+                <CardDescription>
+                  이 가게에 대한 의견, 제안, 요청사항을 남겨주세요.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">건의 내용</label>
+                  <Textarea
+                    placeholder="예: 메뉴에 음료수도 추가해주세요! / 배달 시간이 조금 늦은 것 같아요 / 포장 상태가 좋았어요!"
+                    value={suggestionContent}
+                    onChange={(e) => setSuggestionContent(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </CardContent>
+              <CardFooter>
+                <Button
+                  className="w-full"
+                  onClick={handleSubmitSuggestion}
+                  disabled={isSubmittingSuggestion || !suggestionContent.trim()}
+                >
+                  {isSubmittingSuggestion ? (
+                    <>
+                      <LoadingSpinner size="sm" className="mr-2" />
+                      등록 중...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      건의 등록하기
                     </>
                   )}
                 </Button>

@@ -21,17 +21,20 @@ async function main() {
   console.log('✅ 재판관 계정 생성: 심현보')
 
   // 재판관 가게 생성
-  const judgeShop = await prisma.shop.upsert({
-    where: { ownerId: judge.id },
-    update: {},
-    create: {
-      name: '심현보 법률사무소',
-      jobTitle: '재판관',
-      description: '공정한 재판을 약속드립니다. 상담 환영!',
-      isOpen: true,
-      ownerId: judge.id
-    }
+  let judgeShop = await prisma.shop.findFirst({
+    where: { ownerId: judge.id, name: '심현보 법률사무소' }
   })
+  if (!judgeShop) {
+    judgeShop = await prisma.shop.create({
+      data: {
+        name: '심현보 법률사무소',
+        jobTitle: '재판관',
+        description: '공정한 재판을 약속드립니다. 상담 환영!',
+        isOpen: true,
+        ownerId: judge.id
+      }
+    })
+  }
 
   // 기존 메뉴가 없으면 생성
   const existingMenus = await prisma.menuItem.count({ where: { shopId: judgeShop.id } })

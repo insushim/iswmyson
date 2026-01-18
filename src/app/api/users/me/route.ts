@@ -17,7 +17,7 @@ export async function GET() {
         marks: true,
         isJudge: true,
         createdAt: true,
-        shop: { select: { id: true } },
+        shops: { select: { id: true } },
         _count: {
           select: {
             ordersAsCustomer: true,

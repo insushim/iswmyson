@@ -25,7 +25,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         proposedPrice,
         estimatedDate: estimatedDate,
         ownerMessage,
-        status: 'PRICE_PROPOSED'
+        status: 'PROPOSED'
       },
       include: {
         customer: { select: { id: true, nickname: true } },

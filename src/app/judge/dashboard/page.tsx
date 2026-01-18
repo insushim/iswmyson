@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { LoadingSpinner } from '@/components/common/LoadingSpinner'
-import { Gavel, FileText, Scale, AlertTriangle, Users, Coins, ArrowRight, Plus } from 'lucide-react'
+import { Gavel, FileText, Scale, AlertTriangle, Users, Coins, ArrowRight, Plus, Landmark, RotateCcw } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 interface Stats {
@@ -177,7 +177,24 @@ export default function JudgeDashboardPage() {
       </header>
 
       <main className="container mx-auto px-4 py-8 space-y-6">
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-4 gap-6">
+          <Link href="/judge/government">
+            <Card className="border-2 hover:border-blue-300 transition-colors cursor-pointer border-blue-200 bg-blue-50">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <Landmark className="h-8 w-8 text-blue-500" />
+                </div>
+                <CardTitle>정부</CardTitle>
+                <CardDescription>정부 예산 관리 및 가게 주문</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button variant="ghost" className="w-full">
+                  바로가기 <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Link href="/judge/dashboard/reports">
             <Card className={`border-2 hover:border-amber-300 transition-colors cursor-pointer ${
               stats?.pendingReports ? 'border-amber-200 bg-amber-50' : ''
@@ -430,6 +447,55 @@ export default function JudgeDashboardPage() {
                 피고인은 판결 후 30% 감면을 요청할 수 있습니다.
                 권능의 재량에 따라 감면 여부를 결정합니다.
               </p>
+            </div>
+            <div className="p-4 bg-red-50 rounded-lg">
+              <h3 className="font-medium mb-2 text-red-800">마크 리셋</h3>
+              <p className="text-sm text-red-700 mb-3">
+                모든 유저의 마크를 100으로, 정부를 400마크로 리셋합니다.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={async () => {
+                    if (!confirm('정말로 모든 마크를 리셋하시겠습니까?\n모든 유저: 100마크\n정부: 400마크')) return
+                    try {
+                      const res = await fetch('/api/admin/reset', { method: 'POST' })
+                      const data = await res.json()
+                      if (res.ok) {
+                        toast.success(data.message)
+                      } else {
+                        throw new Error(data.error)
+                      }
+                    } catch (err) {
+                      toast.error('리셋 실패')
+                    }
+                  }}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  전체 리셋
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/admin/update-government', { method: 'POST' })
+                      const data = await res.json()
+                      if (res.ok) {
+                        toast.success(data.message)
+                      } else {
+                        throw new Error(data.error)
+                      }
+                    } catch (err) {
+                      toast.error('업데이트 실패')
+                    }
+                  }}
+                >
+                  <Landmark className="mr-2 h-4 w-4" />
+                  정부 400마크로
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

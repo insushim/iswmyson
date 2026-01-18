@@ -217,13 +217,51 @@ export default function JudgeTrialsPage() {
                         <p className="text-sm bg-gray-50 p-2 rounded">{trial.report.evidence}</p>
                       </div>
                     )}
+
+                    {verdictingId === trial.id ? (
+                      <div className="p-4 bg-purple-50 rounded-lg space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">판결 내용</label>
+                          <Textarea
+                            value={verdictForm.verdict}
+                            onChange={(e) => setVerdictForm({ ...verdictForm, verdict: e.target.value })}
+                            placeholder="판결 내용을 입력하세요 (예: 유죄 - 주문 미이행)"
+                            rows={3}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">벌금 (마크, 없으면 0)</label>
+                          <Input
+                            type="number"
+                            value={verdictForm.fineAmount}
+                            onChange={(e) => setVerdictForm({ ...verdictForm, fineAmount: e.target.value })}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            onClick={() => handleVerdict(trial.id)}
+                            disabled={processingId === trial.id}
+                          >
+                            {processingId === trial.id ? (
+                              <LoadingSpinner size="sm" />
+                            ) : (
+                              <Gavel className="mr-2 h-4 w-4" />
+                            )}
+                            판결 선고
+                          </Button>
+                          <Button variant="outline" onClick={() => setVerdictingId(null)}>
+                            취소
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button onClick={() => setVerdictingId(trial.id)}>
+                        <Gavel className="mr-2 h-4 w-4" />
+                        판결하기
+                      </Button>
+                    )}
                   </CardContent>
-                  <CardFooter>
-                    <Button onClick={() => setVerdictingId(trial.id)}>
-                      <Gavel className="mr-2 h-4 w-4" />
-                      판결하기
-                    </Button>
-                  </CardFooter>
                 </Card>
               ))
             ) : (

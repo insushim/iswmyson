@@ -16,8 +16,18 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     if (!order) return NextResponse.json({ error: '존재하지 않는 주문' }, { status: 404 })
     if (order.customerId !== session.user.id) return NextResponse.json({ error: '권한 없음' }, { status: 403 })
-    if (order.status !== 'PRICE_PROPOSED') return NextResponse.json({ error: '가격 제안된 주문만 승인 가능' }, { status: 400 })
+    if (order.status !== 'PROPOSED') return NextResponse.json({ error: '가격 제안된 주문만 승인 가능' }, { status: 400 })
     if (order.customer.marks < order.proposedPrice!) return NextResponse.json({ error: '마크 부족' }, { status: 400 })
+
+    // 세금 10% 계산
+    const tax = Math.floor(order.proposedPrice! * 0.1)
+    const ownerAmount = order.proposedPrice! - tax
+
+    // 정부 가져오기 또는 생성
+    let government = await prisma.government.findFirst()
+    if (!government) {
+      government = await prisma.government.create({ data: { marks: 400 } })
+    }
 
     const [updatedOrder] = await prisma.$transaction([
       prisma.order.update({
@@ -29,7 +39,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         }
       }),
       prisma.user.update({ where: { id: order.customerId }, data: { marks: { decrement: order.proposedPrice! } } }),
-      prisma.user.update({ where: { id: order.shop.ownerId }, data: { marks: { increment: order.proposedPrice! } } })
+      prisma.user.update({ where: { id: order.shop.ownerId }, data: { marks: { increment: ownerAmount } } }),
+      prisma.government.update({ where: { id: government.id }, data: { marks: { increment: tax } } })
     ])
 
     await prisma.notification.create({
