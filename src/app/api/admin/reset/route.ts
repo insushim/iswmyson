@@ -14,16 +14,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '권한 없음' }, { status: 403 })
     }
 
-    // 1. 모든 유저 마크를 100으로 리셋 (심현보 제외)
+    // 1. 모든 유저 마크를 100으로 리셋 (심현보 포함)
     await prisma.user.updateMany({
-      where: { isJudge: false },
       data: { marks: 100 }
-    })
-
-    // 2. 심현보는 10000 마크 유지
-    await prisma.user.updateMany({
-      where: { isJudge: true },
-      data: { marks: 10000 }
     })
 
     // 3. 정부 마크를 400으로 리셋
