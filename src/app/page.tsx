@@ -39,7 +39,7 @@ export default function HomePage() {
             <CardHeader>
               <Coins className="h-12 w-12 text-amber-500 mb-2" />
               <CardTitle>마크 화폐</CardTitle>
-              <CardDescription>가입 시 1,000 마크 지급!<br />거래와 가게 운영에 사용</CardDescription>
+              <CardDescription>가입 시 100 마크 지급!<br />거래와 가게 운영에 사용</CardDescription>
             </CardHeader>
           </Card>
           <Card className="border-2 hover:border-blue-300 transition-colors">

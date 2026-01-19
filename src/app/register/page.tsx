@@ -37,7 +37,7 @@ export default function RegisterPage() {
       })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || '가입 실패')
-      toast.success('가입 환영합니다! 1,000 마크 지급!')
+      toast.success('가입 환영합니다! 100 마크 지급!')
       router.push('/login')
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : '가입 실패'
@@ -80,7 +80,7 @@ export default function RegisterPage() {
               {errors.confirmPassword && <p className="text-red-500 text-sm mt-1 flex items-center gap-1"><AlertCircle size={14} />{errors.confirmPassword}</p>}
             </div>
             {errors.general && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm flex items-center gap-2"><AlertCircle size={16} />{errors.general}</div>}
-            <div className="bg-amber-50 p-3 rounded-lg text-sm text-amber-800"><p className="font-semibold">가입 혜택</p><p>가입 즉시 1,000 마크 지급!</p></div>
+            <div className="bg-amber-50 p-3 rounded-lg text-sm text-amber-800"><p className="font-semibold">가입 혜택</p><p>가입 즉시 100 마크 지급!</p></div>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />가입 중...</> : '가입하기'}
             </Button>
