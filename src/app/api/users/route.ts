@@ -26,13 +26,13 @@ export async function POST(request: NextRequest) {
       data: {
         nickname,
         password: hashedPassword,
-        marks: 1000,
+        marks: 100,
         isJudge: nickname === '심현보'
       },
       select: { id: true, nickname: true, marks: true, isJudge: true, createdAt: true }
     })
 
-    return NextResponse.json({ success: true, user, message: '가입 완료! 1,000 마크 지급!' })
+    return NextResponse.json({ success: true, user, message: '가입 완료! 100 마크 지급!' })
   } catch (error) {
     console.error('사용자 등록 오류:', error)
     return NextResponse.json({ error: '등록 중 오류 발생' }, { status: 500 })
