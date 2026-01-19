@@ -35,6 +35,21 @@ model Government {
   updatedAt     DateTime  @updatedAt
 
   orders        GovernmentOrder[]
+  taxRecords    TaxRecord[]
+}
+
+model TaxRecord {
+  id              String      @id @default(cuid())
+  governmentId    String
+  government      Government  @relation(fields: [governmentId], references: [id])
+
+  transactionId   String
+  senderNickname  String
+  receiverNickname String
+  originalAmount  Int
+  taxAmount       Int
+
+  createdAt       DateTime    @default(now())
 }
 
 model GovernmentOrder {
