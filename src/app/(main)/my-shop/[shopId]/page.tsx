@@ -19,6 +19,7 @@ interface MenuItem {
   name: string
   description: string | null
   basePrice: number
+  estimatedTime: string | null
   isAvailable: boolean
 }
 
@@ -77,7 +78,8 @@ export default function ShopManagePage({ params }: { params: Promise<{ shopId: s
   const [menuForm, setMenuForm] = useState({
     name: '',
     description: '',
-    basePrice: ''
+    basePrice: '',
+    estimatedTime: ''
   })
 
   // 건의 관련
@@ -295,7 +297,8 @@ export default function ShopManagePage({ params }: { params: Promise<{ shopId: s
         body: JSON.stringify({
           name: menuForm.name,
           description: menuForm.description || null,
-          basePrice: parseInt(menuForm.basePrice)
+          basePrice: parseInt(menuForm.basePrice),
+          estimatedTime: menuForm.estimatedTime || null
         })
       })
 
@@ -305,7 +308,7 @@ export default function ShopManagePage({ params }: { params: Promise<{ shopId: s
       }
 
       toast.success('메뉴가 추가되었습니다!')
-      setMenuForm({ name: '', description: '', basePrice: '' })
+      setMenuForm({ name: '', description: '', basePrice: '', estimatedTime: '' })
       fetchShop()
     } catch (error) {
       const message = error instanceof Error ? error.message : '메뉴 추가 실패'
@@ -481,7 +484,7 @@ export default function ShopManagePage({ params }: { params: Promise<{ shopId: s
               <CardTitle>새 메뉴 추가</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid md:grid-cols-2 gap-4">
                 <Input
                   placeholder="메뉴 이름"
                   value={menuForm.name}
@@ -497,6 +500,11 @@ export default function ShopManagePage({ params }: { params: Promise<{ shopId: s
                   placeholder="기본 가격"
                   value={menuForm.basePrice}
                   onChange={(e) => setMenuForm({ ...menuForm, basePrice: e.target.value })}
+                />
+                <Input
+                  placeholder="예상 소요 시간 (예: 30분, 1시간)"
+                  value={menuForm.estimatedTime}
+                  onChange={(e) => setMenuForm({ ...menuForm, estimatedTime: e.target.value })}
                 />
               </div>
               <Button onClick={handleAddMenu}>
@@ -516,7 +524,12 @@ export default function ShopManagePage({ params }: { params: Promise<{ shopId: s
                       {item.description && (
                         <p className="text-sm text-gray-600">{item.description}</p>
                       )}
-                      <MarkDisplay amount={item.basePrice} size="sm" className="mt-1" />
+                      <div className="flex items-center gap-3 mt-1">
+                        <MarkDisplay amount={item.basePrice} size="sm" />
+                        {item.estimatedTime && (
+                          <span className="text-sm text-gray-500">⏱ {item.estimatedTime}</span>
+                        )}
+                      </div>
                     </div>
                     <Button
                       size="sm"
